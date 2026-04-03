@@ -191,7 +191,7 @@ mvn spring-boot:run
 
 ## 👨‍💻 Author
 
-**Ananth**
+**Ananth Kumar**
 Backend Developer (Java | Spring Boot | Security)
 
 ---
