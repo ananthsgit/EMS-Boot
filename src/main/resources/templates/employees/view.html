@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${employee.name + ' - EMS'}">Employee Profile</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <a href="/" class="sidebar-brand">
+        <div class="brand-icon">EMS</div>
+        <div class="brand-text">
+            <h2>EMS Portal</h2>
+            <span>Employee Management</span>
+        </div>
+    </a>
+    <nav class="sidebar-menu">
+        <div class="menu-label">Main Menu</div>
+        <a href="/"><span class="icon">📊</span> Dashboard</a>
+        <a href="/employees" class="active"><span class="icon">👥</span> Employees</a>
+        <a href="/employees/new"><span class="icon">➕</span> Add Employee</a>
+        <div class="menu-label" style="margin-top:12px;">System</div>
+        <a href="/swagger-ui.html" target="_blank"><span class="icon">🔌</span> API Docs</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/swagger-ui.html" target="_blank"><span class="icon">📋</span> Swagger UI</a>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>Employee Profile</h1>
+            <p th:text="'Viewing details for ' + ${employee.name}"></p>
+        </div>
+        <div class="topbar-right">
+            <a th:href="@{/employees/edit/{id}(id=${employee.id})}" class="btn btn-primary btn-sm">✏️ Edit</a>
+            <a href="/employees" class="btn btn-outline btn-sm">← Back</a>
+            <div class="user-avatar">AD</div>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="card" style="max-width:820px;">
+
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar" th:text="${#strings.substring(employee.name, 0, 1)}"></div>
+                <div class="profile-info">
+                    <h2 th:text="${employee.name}"></h2>
+                    <p th:text="${employee.designation + ' · ' + employee.department}"></p>
+                    <div class="profile-badges">
+                        <span class="badge"
+                              th:classappend="${employee.status.name() == 'ACTIVE'} ? 'badge-active' : (${employee.status.name() == 'ON_LEAVE'} ? 'badge-on-leave' : 'badge-inactive')"
+                              th:text="${employee.status}">
+                        </span>
+                        <span class="badge-dept" th:text="${employee.department}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Body -->
+            <div class="profile-body">
+
+                <div class="detail-section">
+                    <div class="form-section-title">Personal Information</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Employee ID</label>
+                            <span th:text="'#EMP-' + ${employee.id}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Full Name</label>
+                            <span th:text="${employee.name}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Email Address</label>
+                            <span th:text="${employee.email}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone Number</label>
+                            <span th:text="${employee.phone}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Gender</label>
+                            <span th:text="${employee.gender != null} ? ${employee.gender} : 'N/A'"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Address</label>
+                            <span th:text="${employee.address != null and !#strings.isEmpty(employee.address)} ? ${employee.address} : 'N/A'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="form-section-title">Job Information</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Department</label>
+                            <span th:text="${employee.department}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Designation</label>
+                            <span th:text="${employee.designation}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Salary</label>
+                            <span style="font-weight:700; color:var(--success);"
+                                  th:text="'$' + ${#numbers.formatDecimal(employee.salary, 1, 'COMMA', 0, 'POINT')}">
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Join Date</label>
+                            <span th:text="${employee.joinDate}"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status</label>
+                            <span class="badge"
+                                  th:classappend="${employee.status.name() == 'ACTIVE'} ? 'badge-active' : (${employee.status.name() == 'ON_LEAVE'} ? 'badge-on-leave' : 'badge-inactive')"
+                                  th:text="${employee.status}">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a th:href="@{/employees/edit/{id}(id=${employee.id})}" class="btn btn-primary">✏️ Edit Employee</a>
+                    <a th:href="@{/employees/delete/{id}(id=${employee.id})}"
+                       class="btn btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this employee?')">🗑 Delete</a>
+                    <a href="/employees" class="btn btn-outline">← Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

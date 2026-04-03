@@ -1,0 +1,1 @@
+-- data.sql cleared - use the UI or API to add employees

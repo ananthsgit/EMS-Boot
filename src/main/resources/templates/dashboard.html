@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard - EMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <a href="/" class="sidebar-brand">
+        <div class="brand-icon">EMS</div>
+        <div class="brand-text">
+            <h2>EMS Portal</h2>
+            <span>Employee Management</span>
+        </div>
+    </a>
+    <nav class="sidebar-menu">
+        <div class="menu-label">Main Menu</div>
+        <a href="/" class="active"><span class="icon">📊</span> Dashboard</a>
+        <a href="/employees"><span class="icon">👥</span> Employees</a>
+        <a href="/employees/new"><span class="icon">➕</span> Add Employee</a>
+
+        <div class="menu-label" style="margin-top:12px;">System</div>
+        <a href="/swagger-ui.html" target="_blank"><span class="icon">🔌</span> API Docs</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/swagger-ui.html" target="_blank"><span class="icon">📋</span> Swagger UI</a>
+    </div>
+</aside>
+
+<!-- Main -->
+<div class="main-wrapper">
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>Dashboard</h1>
+            <p>Welcome back! Here's what's happening today.</p>
+        </div>
+        <div class="topbar-right">
+            <a href="/employees/new" class="btn btn-primary btn-sm">➕ Add Employee</a>
+            <a href="/swagger-ui.html" target="_blank" class="topbar-btn" title="API Docs">🔌</a>
+            <div class="user-avatar">AD</div>
+        </div>
+    </header>
+
+    <div class="page-content">
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">👥</div>
+                <div class="stat-info">
+                    <h3 th:text="${totalEmployees}">0</h3>
+                    <p>Total Employees</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">✅</div>
+                <div class="stat-info">
+                    <h3 th:text="${activeCount}">0</h3>
+                    <p>Active</p>
+                    <span class="trend up">● Working</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon yellow">🏖️</div>
+                <div class="stat-info">
+                    <h3 th:text="${onLeaveCount}">0</h3>
+                    <p>On Leave</p>
+                    <span class="trend down">● Away</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">❌</div>
+                <div class="stat-info">
+                    <h3 th:text="${inactiveCount}">0</h3>
+                    <p>Inactive</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Recent Employees Table -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3>Recent Employees</h3>
+                        <p>Latest employee records</p>
+                    </div>
+                    <a href="/employees" class="btn btn-outline btn-sm">View All</a>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(recentEmployees)}">
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">👤</div>
+                                        <h3>No employees yet</h3>
+                                        <p>Start by adding your first employee</p>
+                                        <a href="/employees/new" class="btn btn-primary btn-sm">Add Employee</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="emp, stat : ${recentEmployees}" th:if="${stat.index < 8}">
+                                <td>
+                                    <div class="employee-name-cell">
+                                        <div class="emp-avatar"
+                                             th:classappend="${stat.index % 5 == 0} ? 'blue' : (${stat.index % 5 == 1} ? 'green' : (${stat.index % 5 == 2} ? 'purple' : (${stat.index % 5 == 3} ? 'orange' : 'pink')))"
+                                             th:text="${#strings.substring(emp.name, 0, 1)}">
+                                        </div>
+                                        <div>
+                                            <div class="emp-name" th:text="${emp.name}"></div>
+                                            <div class="emp-email" th:text="${emp.email}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-dept" th:text="${emp.department}"></span></td>
+                                <td th:text="${emp.designation}"></td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${emp.status.name() == 'ACTIVE'} ? 'badge-active' : (${emp.status.name() == 'ON_LEAVE'} ? 'badge-on-leave' : 'badge-inactive')"
+                                          th:text="${emp.status}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/employees/view/{id}(id=${emp.id})}" class="btn btn-outline btn-sm btn-icon" title="View">👁</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Department Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3>By Department</h3>
+                        <p>Employee distribution</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div th:if="${#maps.isEmpty(departmentStats)}" style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:0.88rem;">
+                        No department data yet
+                    </div>
+                    <div class="dept-list" th:if="${!#maps.isEmpty(departmentStats)}">
+                        <div class="dept-item" th:each="entry : ${departmentStats}">
+                            <div class="dept-item-header">
+                                <span class="dept-name" th:text="${entry.key}"></span>
+                                <span class="dept-count" th:text="${entry.value}"></span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"
+                                     th:style="'width:' + (${totalEmployees} > 0 ? (${entry.value} * 100 / ${totalEmployees}) : 0) + '%'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

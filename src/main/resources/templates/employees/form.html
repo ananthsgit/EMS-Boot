@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${employee.id == 0} ? 'Add Employee - EMS' : 'Edit Employee - EMS'">Employee Form</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <a href="/" class="sidebar-brand">
+        <div class="brand-icon">EMS</div>
+        <div class="brand-text">
+            <h2>EMS Portal</h2>
+            <span>Employee Management</span>
+        </div>
+    </a>
+    <nav class="sidebar-menu">
+        <div class="menu-label">Main Menu</div>
+        <a href="/"><span class="icon">📊</span> Dashboard</a>
+        <a href="/employees"><span class="icon">👥</span> Employees</a>
+        <a href="/employees/new" class="active"><span class="icon">➕</span> Add Employee</a>
+        <div class="menu-label" style="margin-top:12px;">System</div>
+        <a href="/swagger-ui.html" target="_blank"><span class="icon">🔌</span> API Docs</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/swagger-ui.html" target="_blank"><span class="icon">📋</span> Swagger UI</a>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1 th:text="${employee.id == 0} ? 'Add New Employee' : 'Edit Employee'"></h1>
+            <p th:text="${employee.id == 0} ? 'Fill in the details to register a new employee' : 'Update employee information'"></p>
+        </div>
+        <div class="topbar-right">
+            <a href="/employees" class="btn btn-outline btn-sm">← Back to List</a>
+            <div class="user-avatar">AD</div>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="form-card">
+            <div class="form-card-header">
+                <h3 th:text="${employee.id == 0} ? '👤 New Employee Registration' : '✏️ Edit Employee Record'"></h3>
+                <p>All fields marked are required</p>
+            </div>
+            <div class="form-card-body">
+
+                <!-- Add form -->
+                <form th:if="${employee.id == 0}" th:action="@{/employees/save}" th:object="${employee}" method="post">
+
+                    <div class="form-section-title">Personal Information</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" th:field="*{name}" placeholder="e.g. John Smith"/>
+                            <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" th:field="*{email}" placeholder="john@company.com"/>
+                            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" th:field="*{phone}" placeholder="+1 (555) 000-0000"/>
+                            <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select th:field="*{gender}">
+                                <option value="">-- Select Gender --</option>
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <label>Address</label>
+                            <input type="text" th:field="*{address}" placeholder="Street, City, State"/>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">Job Information</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" th:field="*{department}" placeholder="e.g. Engineering"/>
+                            <span class="error" th:if="${#fields.hasErrors('department')}" th:errors="*{department}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Designation</label>
+                            <input type="text" th:field="*{designation}" placeholder="e.g. Software Engineer"/>
+                            <span class="error" th:if="${#fields.hasErrors('designation')}" th:errors="*{designation}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Salary (USD)</label>
+                            <input type="number" th:field="*{salary}" placeholder="e.g. 75000" step="0.01"/>
+                            <span class="error" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Join Date</label>
+                            <input type="date" th:field="*{joinDate}"/>
+                            <span class="error" th:if="${#fields.hasErrors('joinDate')}" th:errors="*{joinDate}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select th:field="*{status}">
+                                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">✅ Save Employee</button>
+                        <a href="/employees" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+
+                <!-- Edit form -->
+                <form th:if="${employee.id != 0}" th:action="@{/employees/update/{id}(id=${employee.id})}" th:object="${employee}" method="post">
+
+                    <div class="form-section-title">Personal Information</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" th:field="*{name}" placeholder="e.g. John Smith"/>
+                            <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" th:field="*{email}" placeholder="john@company.com"/>
+                            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" th:field="*{phone}" placeholder="+1 (555) 000-0000"/>
+                            <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select th:field="*{gender}">
+                                <option value="">-- Select Gender --</option>
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <label>Address</label>
+                            <input type="text" th:field="*{address}" placeholder="Street, City, State"/>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">Job Information</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" th:field="*{department}" placeholder="e.g. Engineering"/>
+                            <span class="error" th:if="${#fields.hasErrors('department')}" th:errors="*{department}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Designation</label>
+                            <input type="text" th:field="*{designation}" placeholder="e.g. Software Engineer"/>
+                            <span class="error" th:if="${#fields.hasErrors('designation')}" th:errors="*{designation}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Salary (USD)</label>
+                            <input type="number" th:field="*{salary}" placeholder="e.g. 75000" step="0.01"/>
+                            <span class="error" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Join Date</label>
+                            <input type="date" th:name="joinDate"
+                                   th:value="${#temporals.format(employee.joinDate, 'yyyy-MM-dd')}"/>
+                            <span class="error" th:if="${#fields.hasErrors('joinDate')}" th:errors="*{joinDate}"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select th:field="*{status}">
+                                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Update Employee</button>
+                        <a th:if="${employee.status.name() != 'ON_LEAVE'}"
+                           th:href="@{/employees/mark-on-leave/{id}(id=${employee.id})}"
+                           class="btn btn-warning"
+                           onclick="return confirm('Mark this employee as On Leave?')">🏖️ Mark On Leave</a>
+                        <a th:if="${employee.status.name() == 'ON_LEAVE'}"
+                           th:href="@{/employees/mark-active/{id}(id=${employee.id})}"
+                           class="btn btn-success"
+                           onclick="return confirm('Mark this employee as Active?')">✅ Mark Active</a>
+                        <a href="/employees" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
